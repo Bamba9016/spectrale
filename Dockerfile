@@ -1,14 +1,15 @@
-FROM python:3.10-slim
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ARG PYTHON_VERSION=3.10-slim
+FROM python:${PYTHON_VERSION}
 
 WORKDIR /app
 
+WORKDIR /code
+
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY . .
 
-# Le port sera défini par l'environnement
-CMD gunicorn plant_disease.wsgi:application --bind 0.0.0.0:$PORT
+EXPOSE 8000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "plant_disease.wsgi:application"]
