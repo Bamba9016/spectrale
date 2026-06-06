@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Résultat du diagnostic café</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .result-card {
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.25);
+            transition: transform 0.2s;
+        }
+        .result-card:hover {
+            transform: translateY(-4px);
+        }
+        .card-header-custom {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: none;
+        }
+        .card-header-custom.rust {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: white;
+        }
+        .card-header-custom.norust {
+            background: linear-gradient(135deg, #1e7e34, #2c5e2e);
+            color: white;
+        }
+        .card-header-custom i {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        .card-header-custom h2 {
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.6rem;
+        }
+        .card-body-custom {
+            background: white;
+            padding: 1.8rem;
+            text-align: center;
+        }
+        .prob-circle {
+            background: #f8f9fc;
+            border-radius: 50%;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .prob-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #2c5e2e;
+        }
+        .prob-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6c757d;
+        }
+        .info-line {
+            font-size: 1rem;
+            margin: 1rem 0;
+        }
+        .btn-custom {
+            background: #2c5e2e;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            width: auto;
+            margin-top: 0.5rem;
+        }
+        .btn-custom:hover {
+            background: #1e3a1f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+        }
+        @media (max-width: 576px) {
+            .card-header-custom i {
+                font-size: 2.2rem;
+            }
+            .card-header-custom h2 {
+                font-size: 1.3rem;
+            }
+            .prob-circle {
+                width: 110px;
+                height: 110px;
+            }
+            .prob-value {
+                font-size: 1.8rem;
+            }
+            .btn-custom {
+                width: 100%;
+            }
+        }
+        .badge-risk {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 2rem;
+            display: inline-block;
+        }
+        .text-muted-small {
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+<div class="result-card">
+    <div class="card-header-custom {% if is_rust %}rust{% else %}norust{% endif %}">
+        <i class="fas {% if is_rust %}fa-skull-crossbones{% else %}fa-check-circle{% endif %}"></i>
+        <h2>{% if is_rust %}⚠️ Rouille détectée{% else %}✅ Culture saine{% endif %}</h2>
+    </div>
+    <div class="card-body-custom">
+        <div class="prob-circle">
+            <div class="prob-value">{{ probabilite|floatformat:3 }}</div>
+            <div class="prob-label">probabilité rouille</div>
+        </div>
+
+        <div class="info-line">
+            <strong>Classe prédite :</strong>
+            <span class="badge {% if is_rust %}bg-danger{% else %}bg-success{% endif %} p-2">
+                {{ classe }}
+            </span>
+        </div>
+
+        {% if is_rust %}
+        <div class="alert alert-warning mt-3" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> Un traitement antifongique est recommandé. Surveillez les parcelles voisines.
+        </div>
+        {% else %}
+        <div class="alert alert-success mt-3" role="alert">
+            <i class="fas fa-seedling me-2"></i> Aucun signe de rouille. Maintenez les bonnes pratiques agricoles.
+        </div>
+        {% endif %}
+
+        <a href="/" class="btn btn-custom">
+            <i class="fas fa-arrow-left me-2"></i> Nouvelle analyse
+        </a>
+        <p class="text-muted-small mt-3 mb-0">
+            <i class="fas fa-microscope"></i> Modèle SVM – fiabilité > 90%
+        </p>
+    </div>
+</div>
+</body>
+</html>

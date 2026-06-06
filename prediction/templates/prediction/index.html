@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Prédiction maladies du café - Agriculture de précision</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        .main-card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        .card-header-custom {
+            background: #2c5e2e;
+            color: white;
+            padding: 1.2rem 1.5rem;
+            border-bottom: none;
+        }
+        .card-header-custom h1 {
+            font-size: 1.7rem;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        .card-header-custom p {
+            margin: 0.3rem 0 0;
+            opacity: 0.85;
+            font-size: 0.9rem;
+        }
+        .nav-tabs .nav-link {
+            font-weight: 500;
+            color: #2c5e2e;
+            border: none;
+            padding: 0.8rem 1.2rem;
+            transition: all 0.2s;
+        }
+        .nav-tabs .nav-link.active {
+            color: #1e3a1f;
+            background-color: transparent;
+            border-bottom: 3px solid #2c5e2e;
+            font-weight: 600;
+        }
+        .nav-tabs .nav-link:hover:not(.active) {
+            border-bottom: 3px solid #a0c4a2;
+            color: #1e3a1f;
+        }
+        .form-label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #2c5e2e;
+            margin-bottom: 0.25rem;
+        }
+        .form-control, input, select {
+            border-radius: 0.75rem;
+            border: 1px solid #ced4da;
+            padding: 0.6rem 0.8rem;
+            transition: 0.2s;
+        }
+        .form-control:focus {
+            border-color: #2c5e2e;
+            box-shadow: 0 0 0 0.2rem rgba(44, 94, 46, 0.25);
+        }
+        .btn-primary {
+            background-color: #2c5e2e;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #1e3a1f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .alert-info-custom {
+            background: #e9f5ea;
+            border-left: 5px solid #2c5e2e;
+            border-radius: 0.9rem;
+            font-size: 0.85rem;
+        }
+        .footer-note {
+            font-size: 0.75rem;
+            color: #6c757d;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            .card-header-custom h1 {
+                font-size: 1.3rem;
+            }
+            .btn-primary {
+                width: 100%;
+            }
+            .nav-tabs .nav-link {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            .form-label {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-3 my-md-5">
+    <div class="main-card">
+        <div class="card-header-custom">
+            <h1><i class="fas fa-leaf me-2"></i> Café : diagnostic santé par spectroscopie</h1>
+            <p>Entrez les variables multispectrales ou importez un fichier CSV pour prédire l'état (rouille / sain)</p>
+        </div>
+
+        <div class="p-3 p-md-4">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual" type="button" role="tab">
+                        <i class="fas fa-pen-alt me-1"></i> Saisie manuelle
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="csv-tab" data-bs-toggle="tab" data-bs-target="#csv" type="button" role="tab">
+                        <i class="fas fa-upload me-1"></i> Import CSV
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" href="/info/">
+                        <i class="fas fa-chart-line me-1"></i> Infos modèle
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-4" id="myTabContent">
+                <!-- Saisie manuelle -->
+                <div class="tab-pane fade show active" id="manual" role="tabpanel">
+                    <form method="post" action="/predict/">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            {% for field in form %}
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <label class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+                                <div class="form-text text-muted small">ex: 1.759, 16.196...</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="d-flex justify-content-center justify-content-md-start mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-microscope me-2"></i> Diagnostiquer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Import CSV -->
+                <div class="tab-pane fade" id="csv" role="tabpanel">
+                    <form method="post" action="/upload/" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ csv_form.as_p }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-chart-simple me-2"></i> Analyser le fichier
+                        </button>
+                    </form>
+                    <div class="alert alert-info-custom mt-4 p-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Format attendu :</strong> fichier CSV (ou Excel) avec les colonnes exactes :
+                        <code>Blue_mean, Green_mean, Red_mean, RedEdge_mean, NIR_mean, GNDVI_std, NDRE_std, PSRI_mean, PSRI_std, R_B_ratio_mean</code>.
+                        <br>Les valeurs décimales peuvent utiliser le point (.) ou la virgule (,).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-note">
+        <i class="fas fa-tractor me-1"></i> Agriculture de précision - Modèle SVM optimisé (F1-score 0.93)
+        | <i class="fas fa-chart-line"></i> Interprétabilité SHAP disponible
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
